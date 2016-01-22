@@ -1,0 +1,24 @@
+{
+  "name": "lplabs/wordpress-muplugin-installer",
+  "description": "Install WordPress must-use plugins with Composer",
+  "type": "composer-plugin",
+  "license": "proprietary",
+  "keywords": [ "composer plugin", "WordPress", "must use", "must-use", "plugin", "installer", "Lonely Planet", "LP Labs" ],
+  "authors": [
+    {
+      "name": "Eric King",
+      "email": "eric.king@lonelyplanet.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "LPlabs\\Composer\\": "src/"
+    }
+  },
+  "extra": {
+    "class": "LPlabs\\Composer\\WPMUPluginInstaller"
+  },
+  "require": {
+    "composer-plugin-api": "1.0.0"
+  }
+}
