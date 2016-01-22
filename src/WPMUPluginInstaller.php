@@ -53,7 +53,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
     /**
      * Setup events
      *
-     * @return void
+     * @return array
      */
     public static function getSubscribedEvents()
     {
