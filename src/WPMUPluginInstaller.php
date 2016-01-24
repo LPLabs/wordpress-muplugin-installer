@@ -117,7 +117,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      * @param mixed $default
      * @return mixed
      */
-    protected function getPackageExtra(PackageInterface $package, $key, $default = '')
+    protected function getPackageExtra(PackageInterface $package, $key, $default = null)
     {
         $extra = $package->getExtra();
 
@@ -128,25 +128,38 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      * Get the details about the must-use plugin entry point file
      *
      * @param PackageInterface $package
-     * @return false|array
+     * @return array
      */
     protected function getEntryFileDetails(PackageInterface $package)
     {
+        $details = array();
         $entry = $this->getPackageExtra($package, self::EXTRA_KEY);
+        $installPathSrc = $this->composer->getInstallationManager()->getInstallPath($package);
+        $installPathDest = realpath($installPathSrc . '/../');
 
-        if (empty($entry)) {
-            return false;
+        if (isset($entry)) {
+            if (! is_array($entry)) {
+                $entry = array($entry);
+            }
+        } else {
+            $entry = array();
+            $files = glob($installPathSrc . '/*.php', GLOB_NOSORT);
+
+            foreach ($files as &$file) {
+                $entry[] = basename($file);
+            }
         }
 
-        $installPathSource = $this->composer->getInstallationManager()->getInstallPath($package);
+        foreach ($entry as &$file) {
+            $src = realpath($installPathSrc . '/' . $file);
+            if ($this->looksLikeWordPressPlugin($src)) {
+                $dest = $installPathDest . '/' . $file;
 
-        $src = realpath($installPathSource . '/' . $entry);
+                $details[ $file ] = compact('src', 'dest');
+            }
+        }
 
-        $installPathDestination = realpath($installPathSource . '/../');
-
-        $dest = $installPathDestination !== false ? $installPathDestination . '/' . $entry : false;
-
-        return compact('entry', 'src', 'dest');
+        return $details;
     }
 
     /**
@@ -154,6 +167,8 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      *
      * @param PackageInterface $package
      * @param bool $install If false it will uninstall
+     * @throws CopyException
+     * @throws UnlinkException
      * @return bool
      */
     protected function manageMustusePlugin(PackageInterface $package, $install = true)
@@ -162,31 +177,32 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
             return false;
         }
 
-        $entry = $this->getEntryFileDetails($package);
+        $entries = $this->getEntryFileDetails($package);
 
-        if ($entry !== false) {
-            if ($entry['src'] !== false && $entry['dest'] !== false) {
-                if ($install) {
-                    copy($entry['src'], $entry['dest']);
-                } else {
-                    unlink($entry['dest']);
+        foreach ($entries as $file => $entry) {
+            if ($install) {
+                if (! isset($entry['src'], $entry['dest']) || ! copy($entry['src'], $entry['dest'])) {
+                    $this->io->writeError($file . ' not installed');
+
+                    throw new CopyException(sprintf(
+                        '%s not copied to %s',
+                        $entry['src'],
+                        $entry['dest']
+                    ));
                 }
-
-                $exists = file_exists($entry['dest']);
-                
-                return $install ? $exists : ! $exists;
             } else {
-                if ($entry['src'] === false) {
-                    $this->io->writeError('plugin entry file source was not found');
-                }
+                if (! isset($entry['dest']) || ! unlink($entry['dest'])) {
+                    $this->io->writeError($file . ' not uninstalled');
 
-                if ($entry['dest'] === false) {
-                    $this->io->writeError('plugin entry file destination was not found');
+                    throw new UnlinkException(sprintf(
+                        '%s not deleted',
+                        $entry['dest']
+                    ));
                 }
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -209,5 +225,24 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
     protected function uninstallMustusePlugin(PackageInterface $package)
     {
         return $this->manageMustusePlugin($package, false);
+    }
+
+    /**
+     * Does the file look like a WordPress plugin?
+     *
+     * @param string $file
+     * @return bool
+     */
+    protected function looksLikeWordPressPlugin($file)
+    {
+        if (! file_exists($file)) {
+            return false;
+        }
+
+        $fp = fopen($file, 'r');
+        $chunk = str_replace("\r", "\n", fread($fp, 8192));
+        fclose($fp);
+
+        return preg_match('/^[ \t\/*#@]*Plugin Name:(.*)$/mi', $chunk, $match) && $match[1];
     }
 }
