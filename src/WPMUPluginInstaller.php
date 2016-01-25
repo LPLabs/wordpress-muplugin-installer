@@ -61,7 +61,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
             PackageEvents::POST_PACKAGE_INSTALL  => array('onPostPackageInstall',  0),
             PackageEvents::PRE_PACKAGE_UPDATE    => array('onPrePackageUpdate',    0),
             PackageEvents::POST_PACKAGE_UPDATE   => array('onPostPackageUpdate',   0),
-            PackageEvents::PRE_PACKAGE_UNINSTALL => array('onPrePackageUninstall', 0)
+            PackageEvents::PRE_PACKAGE_UNINSTALL => array('onPrePackageUninstall', 0),
         );
     }
 
@@ -133,7 +133,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
     protected function getEntryFileDetails(PackageInterface $package)
     {
         $details = array();
-        $entry = $this->getPackageExtra($package, self::EXTRA_KEY);
+        $entry = $this->getPackageExtra($package, static::EXTRA_KEY);
         $installPathSrc = $this->composer->getInstallationManager()->getInstallPath($package);
         $installPathDest = realpath($installPathSrc . '/../');
 
@@ -152,7 +152,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
 
         foreach ($entry as &$file) {
             $src = realpath($installPathSrc . '/' . $file);
-            if ($this->looksLikeWordPressPlugin($src)) {
+            if ($this->looksLikePlugin($src)) {
                 $dest = $installPathDest . '/' . $file;
 
                 $details[ $file ] = compact('src', 'dest');
@@ -173,7 +173,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      */
     protected function manageMustusePlugin(PackageInterface $package, $install = true)
     {
-        if ($package->getType() !== self::PACKAGE_TYPE) {
+        if ($package->getType() !== static::PACKAGE_TYPE) {
             return false;
         }
 
@@ -233,7 +233,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      * @param string $file
      * @return bool
      */
-    protected function looksLikeWordPressPlugin($file)
+    protected function looksLikePlugin($file)
     {
         if (! file_exists($file)) {
             return false;
