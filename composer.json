@@ -25,7 +25,7 @@
     "class": "LPlabs\\Composer\\WPMUPluginInstaller"
   },
   "require": {
-    "composer-plugin-api": "1.0.0"
+    "composer-plugin-api": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.1",
