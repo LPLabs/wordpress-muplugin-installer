@@ -69,7 +69,9 @@ class WPMUPluginInstallerTest extends \PHPUnit_Framework_TestCase
 
         $events = array_keys($plugin->getSubscribedEvents());
 
-        $eventDispatcher = $this->getMockBuilder('Composer\EventDispatcher\EventDispatcher')->disableOriginalConstructor()->getMock();
+        $eventDispatcher = $this->getMockBuilder('Composer\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $eventDispatcher
             ->expects($this->exactly(count($events)))
