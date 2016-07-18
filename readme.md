@@ -1,5 +1,10 @@
 # WordPress must-use plugin installer
 
+[![Build Status](https://travis-ci.org/LPLabs/wordpress-muplugin-installer.svg?branch=master)](https://travis-ci.org/LPLabs/wordpress-muplugin-installer)
+[![Test Coverage](https://codeclimate.com/github/LPLabs/wordpress-muplugin-installer/badges/coverage.svg)](https://codeclimate.com/github/LPLabs/wordpress-muplugin-installer/coverage)
+[![Code Climate](https://codeclimate.com/github/LPLabs/wordpress-muplugin-installer/badges/gpa.svg)](https://codeclimate.com/github/LPLabs/wordpress-muplugin-installer)
+[![Issue Count](https://codeclimate.com/github/LPLabs/wordpress-muplugin-installer/badges/issue_count.svg)](https://codeclimate.com/github/LPLabs/wordpress-muplugin-installer/issues)
+
 The [Multi-Framework Composer Library Installer](https://github.com/composer/installers) does not completely install WordPress **must-use plugins**.
 It does put the plugin in the `mu-plugins` folder, but that isn't enough to be recognized as a must-use plugin by WordPress.
 
