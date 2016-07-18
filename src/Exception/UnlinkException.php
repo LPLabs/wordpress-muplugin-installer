@@ -1,6 +1,6 @@
 <?php
 
-namespace LPLabs\Composer;
+namespace LPLabs\Composer\Exception;
 
 class UnlinkException extends \Exception
 {

@@ -1,6 +1,6 @@
 <?php
 /**
- * WordPress must-use plugin installer
+ * Install WordPress must-use plugins with Composer
  *
  * @author Eric King <eric.king@lonelyplanet.com>
  */
@@ -14,7 +14,13 @@ use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
+use LPLabs\Composer\Exception\CopyException;
+use LPLabs\Composer\Exception\UnlinkException;
 
+/**
+ * This Composer plugin listens for package events and correctly installs
+ * WordPress must-use plugin entry files to the correct location.
+ */
 class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
 {
     /**
@@ -57,12 +63,12 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            PackageEvents::POST_PACKAGE_INSTALL  => array('onPostPackageInstall',  0),
-            PackageEvents::PRE_PACKAGE_UPDATE    => array('onPrePackageUpdate',    0),
-            PackageEvents::POST_PACKAGE_UPDATE   => array('onPostPackageUpdate',   0),
-            PackageEvents::PRE_PACKAGE_UNINSTALL => array('onPrePackageUninstall', 0),
-        );
+        return [
+            PackageEvents::POST_PACKAGE_INSTALL  => [ 'onPostPackageInstall',  0 ],
+            PackageEvents::PRE_PACKAGE_UPDATE    => [ 'onPrePackageUpdate',    0 ],
+            PackageEvents::POST_PACKAGE_UPDATE   => [ 'onPostPackageUpdate',   0 ],
+            PackageEvents::PRE_PACKAGE_UNINSTALL => [ 'onPrePackageUninstall', 0 ],
+        ];
     }
 
     /**
@@ -132,26 +138,27 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      */
     protected function getEntryFileDetails(PackageInterface $package)
     {
-        $details = array();
+        $details = [];
         $entry = $this->getPackageExtra($package, static::EXTRA_KEY);
         $installPathSrc = $this->composer->getInstallationManager()->getInstallPath($package);
         $installPathDest = realpath($installPathSrc . '/../');
 
         if (isset($entry)) {
             if (! is_array($entry)) {
-                $entry = array($entry);
+                $entry = [ $entry ];
             }
         } else {
-            $entry = array();
+            $entry = [];
             $files = glob($installPathSrc . '/*.php', GLOB_NOSORT);
 
-            foreach ($files as &$file) {
+            foreach ($files as $file) {
                 $entry[] = basename($file);
             }
         }
 
-        foreach ($entry as &$file) {
+        foreach ($entry as $file) {
             $src = realpath($installPathSrc . '/' . $file);
+
             if ($this->looksLikePlugin($src)) {
                 $dest = $installPathDest . '/' . $file;
 
@@ -235,13 +242,11 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
      */
     protected function looksLikePlugin($file)
     {
-        if (! file_exists($file)) {
+        if (! file_exists($file) || ! is_readable($file)) {
             return false;
         }
 
-        $fp = fopen($file, 'r');
-        $chunk = str_replace("\r", "\n", fread($fp, 8192));
-        fclose($fp);
+        $chunk = str_replace("\r", "\n", file_get_contents($file, false, null, 0, 8192));
 
         return preg_match('/^[ \t\/*#@]*Plugin Name:(.*)$/mi', $chunk, $match) && $match[1];
     }
