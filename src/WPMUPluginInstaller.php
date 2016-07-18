@@ -18,7 +18,7 @@ use LPLabs\Composer\Exception\CopyException;
 use LPLabs\Composer\Exception\UnlinkException;
 
 /**
- * This Composer plugin listens for package events and correctly installs
+ * This Composer plugin listens for package events and installs
  * WordPress must-use plugin entry files to the correct location.
  */
 class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
@@ -224,7 +224,7 @@ class WPMUPluginInstaller implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Remove the must-use plugin entry point file to the mu-plugins directory
+     * Remove the must-use plugin entry point file from the mu-plugins directory
      *
      * @param PackageInterface $package
      * @return bool

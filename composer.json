@@ -22,8 +22,8 @@
     }
   ],
   "support": {
-    "source": "https://github.com/lplabs/wordpress-muplugin-installer",
-    "issues": "https://github.com/lplabs/wordpress-muplugin-installer/issues"
+    "source": "https://github.com/LPLabs/wordpress-muplugin-installer",
+    "issues": "https://github.com/LPLabs/wordpress-muplugin-installer/issues"
   },
   "autoload": {
     "psr-4": {
