@@ -36,10 +36,10 @@
     }
   },
   "extra": {
-    "class": "LPLabs\\Composer\\WPMUPluginInstaller"
+    "class": "LPLabs\\Composer\\WordPressMustUsePlugins"
   },
   "require": {
-    "php": ">=5.4",
+    "php": "^5.5 || ^7.0",
     "composer-plugin-api": "^1.0",
     "composer/installers": "^1.0"
   },
@@ -49,6 +49,6 @@
     "composer/composer": "^1.0",
     "squizlabs/php_codesniffer": "^2.6",
     "phpmd/phpmd": "^2.4",
-    "codeclimate/php-test-reporter": "^0.3.2"
+    "codeclimate/php-test-reporter": "dev-master"
   }
 }
