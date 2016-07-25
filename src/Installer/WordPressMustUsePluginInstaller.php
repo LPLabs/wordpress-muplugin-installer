@@ -24,7 +24,7 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
 
         if ($installed) {
             foreach ($this->getEntryFileLocations($package) as $entryFile) {
-                if (! file_exists($entryFile)) {
+                if (! $this->filesystem->isFile($entryFile)) {
                     $installed = false;
                     break;
                 }
@@ -196,7 +196,7 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
      */
     protected function looksLikePlugin($file)
     {
-        if (! $file || ! file_exists($file) || ! is_readable($file)) {
+        if (! $file || ! $this->filesystem->isFile($file) || ! $this->filesystem->isReadable($file)) {
             return false;
         }
 
