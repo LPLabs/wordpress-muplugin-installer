@@ -7,31 +7,14 @@
 
 namespace LPLabs\Composer\Installer;
 
-use Composer\Package\PackageInterface;
+use RuntimeException;
 use Composer\Installer\LibraryInstaller;
-use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Installers\WordPressInstaller;
+use Composer\Package\PackageInterface;
+use Composer\Repository\InstalledRepositoryInterface;
 
 class WordPressMustUsePluginInstaller extends LibraryInstaller
 {
-    /**
-     * @var string
-     */
-    const PACKAGE_TYPE = 'wordpress-muplugin';
-
-    /**
-     * @var string
-     */
-    const EXTRA_KEY = 'wordpress-muplugin-entry';
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supports($packageType)
-    {
-        return $packageType === static::PACKAGE_TYPE;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -102,7 +85,7 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
     protected function installEntryFiles(PackageInterface $package)
     {
         foreach ($this->getEntryFileLocations($package) as $src => $dest) {
-            $copied = copy($src, $dest);
+            $copied = $this->filesystem->copyFile($src, $dest);
 
             $this->io->notice(
                 sprintf(
@@ -112,6 +95,10 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
                     $copied ? '<fg=green>OK</>' : '<fg=red>FAILED</>'
                 )
             );
+
+            if (! $copied) {
+                throw new RuntimeException(sprintf('Cannot copy %s to %s', $src, $dest));
+            }
         }
     }
 
@@ -124,7 +111,7 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
     protected function uninstallEntryFiles(PackageInterface $package)
     {
         foreach ($this->getEntryFileLocations($package) as $dest) {
-            $unlinked = unlink($dest);
+            $unlinked = $this->filesystem->unlinkFile($dest);
 
             $this->io->notice(
                 sprintf(
@@ -133,6 +120,10 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
                     $unlinked ? '<fg=green>OK</>' : '<fg=red>FAILED</>'
                 )
             );
+
+            if (! $unlinked) {
+                throw new RuntimeException('Cannot unlink ' . $dest);
+            }
         }
     }
 
@@ -179,7 +170,7 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
     protected function getPackageEntryPoints(PackageInterface $package)
     {
         $dir = $this->composer->getInstallationManager()->getInstallPath($package);
-        $entry = $this->getPackageExtra($package, static::EXTRA_KEY);
+        $entry = $this->getPackageExtra($package, 'wordpress-muplugin-entry');
         $entryPoints = $entry ? (is_array($entry) ? $entry : [ $entry ]) : [];
 
         if (empty($entryPoints)) {
