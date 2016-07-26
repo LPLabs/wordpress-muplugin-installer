@@ -2,7 +2,7 @@
   "name": "lplabs/wordpress-muplugin-installer",
   "description": "Install WordPress must-use plugins with Composer",
   "type": "composer-plugin",
-  "license": "proprietary",
+  "license": "MIT",
   "keywords": [
     "WordPress",
     "plugin",
