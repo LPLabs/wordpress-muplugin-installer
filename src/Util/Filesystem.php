@@ -33,17 +33,7 @@ class Filesystem extends ComposerFilesystem
 
     public function canWrite($file)
     {
-        if ($this->isWritable($file)) {
-            return true;
-        }
-
-        $dir = dirname($file);
-
-        if ($this->isDir($dir)) {
-            return $this->isWritable($dir);
-        }
-
-        return false;
+        return $this->isWritable($this->exists($file) ? $file : dirname($file));
     }
 
     public function copyFile($src, $dest)

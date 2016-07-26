@@ -1,13 +1,12 @@
 <?php
 
-namespace LPLabs\Composer\Tests;
+namespace LPLabs\Composer\Tests\Installer;
 
 use InvalidArgumentException;
 use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\Package;
-// use Composer\Package\RootPackage;
 use LPLabs\Composer\Util\Filesystem;
 use LPLabs\Composer\Installer\WordPressMustUsePluginInstaller;
 
@@ -27,12 +26,12 @@ class WordPressMustUsePluginInstallerTest extends \PHPUnit_Framework_TestCase
      * @var Filesystem
      */
     protected $fs;
-    
+
     /**
      * @var Config
      */
     protected $config;
-    
+
     /**
      * @var Composer
      */
