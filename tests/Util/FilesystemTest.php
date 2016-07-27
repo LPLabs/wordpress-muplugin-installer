@@ -28,8 +28,6 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $tmpDir = realpath(sys_get_temp_dir());
-
         $this->fs = new Filesystem;
 
         $this->tmpDir = $this->getTempDir();
