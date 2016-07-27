@@ -150,10 +150,12 @@ class WordPressMustUsePluginInstaller extends LibraryInstaller
      */
     protected function getEntryFileLocations(PackageInterface $package)
     {
+        $muPluginsDir = dirname($this->composer->getInstallationManager()->getInstallPath($package));
+
         return array_reduce(
             $this->getPackageEntryPoints($package),
-            function ($locations, $entryPoint) {
-                $locations[ $entryPoint ] = dirname(dirname($entryPoint)) . DIRECTORY_SEPARATOR . basename($entryPoint);
+            function ($locations, $entryPoint) use ($muPluginsDir) {
+                $locations[ $entryPoint ] =  $muPluginsDir . DIRECTORY_SEPARATOR . basename($entryPoint);
 
                 return $locations;
             },
