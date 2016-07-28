@@ -33,3 +33,11 @@ Your plugin can indicate which file is the main entry point by specifying it in 
 
 If you do not specify `wordpress-muplugin-entry`, this plugin will figure out which PHP files
 are WordPress plugins by looking for `Plugin Name:` in the first 8 kilobytes of each PHP file in the root of your plugin folder.
+
+## Git hooks
+
+Run this to install a git hook that will run PHPCS, PHPMD, and PHPUnit before you commit.
+
+```
+composer setup-hooks
+```

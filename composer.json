@@ -50,5 +50,19 @@
     "squizlabs/php_codesniffer": "^2.6",
     "phpmd/phpmd": "^2.4",
     "codeclimate/php-test-reporter": "dev-master"
+  },
+  "scripts": {
+    "cs": "phpcs --standard=PSR2 --encoding=utf-8 ./src/ ./tests/",
+    "md": "phpmd 'src,tests' text phpmd.xml",
+    "test": "phpunit --colors=always",
+    "pre-commit": [
+      "@cs",
+      "@md",
+      "@test"
+    ],
+    "setup-hooks": [
+      "php -r \"copy('./hooks/pre-commit', '.git/hooks/pre-commit');\"",
+      "php -r \"chmod('.git/hooks/pre-commit', 0700);\""
+    ]
   }
 }
